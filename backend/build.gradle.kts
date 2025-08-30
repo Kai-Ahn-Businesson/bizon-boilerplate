@@ -1,3 +1,7 @@
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -18,6 +22,12 @@ java {
     toolchain { languageVersion = JavaLanguageVersion.of(24) }
     sourceCompatibility = JavaVersion.VERSION_24
 }
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-opt-in=kotlin.RequiresOptIn")
+        allWarningsAsErrors = true
+    }
+}
 
 configurations {
     compileOnly { extendsFrom(configurations.annotationProcessor.get()) }
@@ -36,11 +46,13 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-// null safety strict
-kotlin {
+
+//  kotlin
+tasks.withType<KotlinCompile> {
     compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict", "-opt-in=kotlin.RequiresOptIn")
-        allWarningsAsErrors = true
+        jvmTarget.set(JvmTarget.JVM_24)
+        languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+        apiVersion.set(KotlinVersion.KOTLIN_2_2)
     }
 }
 
