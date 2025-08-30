@@ -45,15 +45,6 @@ repositories {
 }
 
 dependencies {
-
-    // Configuration Processor
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-// TODO: 아직 해당 부분 스프링 부트가 미지원 하는 듯, 일단 레거시로 대체..
-//    ksp("org.springframework.boot:spring-boot-configuration-processor")
-    kapt("org.springframework.boot:spring-boot-configuration-processor")
-
-
-
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-batch")
@@ -80,6 +71,13 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")    // 프로덕션
     runtimeOnly("com.h2database:h2")            // 개발 환경: H2 사용 (빠른 개발/디버깅)
     testImplementation("com.h2database:h2")     // 테스트: H2 사용 (격리된 테스트 환경) - `@DataJpaTest`등
+
+
+    // Configuration Processor
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    // TODO: 아직 해당 부분 스프링 부트가 미지원 하는 듯, 일단 레거시로 대체..
+    //  ksp("org.springframework.boot:spring-boot-configuration-processor")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
 
 
 }
