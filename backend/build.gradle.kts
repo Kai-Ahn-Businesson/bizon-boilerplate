@@ -48,10 +48,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-hateoas")
     implementation("org.springframework.boot:spring-boot-starter-integration")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-data-rest")
+    implementation("org.springframework.data:spring-data-rest-hal-explorer")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
