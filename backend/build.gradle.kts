@@ -44,7 +44,10 @@ repositories {
 
 dependencies {
 
+    // Configuration Processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    ksp("org.springframework.boot:spring-boot-configuration-processor")
+
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
