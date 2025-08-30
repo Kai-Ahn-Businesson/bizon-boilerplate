@@ -20,6 +20,10 @@ java {
     }
 }
 
+configurations {
+    compileOnly { extendsFrom(configurations.annotationProcessor.get()) }
+    testCompileOnly { extendsFrom(configurations.testAnnotationProcessor.get()) }
+}
 repositories {
     mavenCentral()
 }
