@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
@@ -6,7 +9,9 @@ plugins {
 }
 
 group = "com.bizon"
-version = "0.0.1-SNAPSHOT"
+var releaseVer = "v0.0.1"
+version =
+    "$releaseVer-${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))}"
 description = "backend"
 
 java {
