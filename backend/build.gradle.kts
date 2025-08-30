@@ -13,6 +13,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.hibernate.orm") version "6.6.26.Final"
     id("org.graalvm.buildtools.native") version "0.10.6"
+    id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 
 }
 
