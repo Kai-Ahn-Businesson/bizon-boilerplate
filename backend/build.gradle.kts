@@ -6,15 +6,15 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    kotlin("jvm") version "2.2.0"
-    kotlin("plugin.spring") version "2.2.0"
-    kotlin("plugin.jpa") version "2.2.0"
+    kotlin("jvm") version "2.2.10"
+    kotlin("plugin.spring") version "2.2.10"
+    kotlin("plugin.jpa") version "2.2.10"
+    kotlin("kapt") version "2.2.10" //TODO: kapt는 유지보수로 바뀌었으므로 최대한 ksp로 전부 교체할 것
+    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
     id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.hibernate.orm") version "6.6.26.Final"
     id("org.graalvm.buildtools.native") version "0.10.6"
-    kotlin("kapt") version "2.2.20-RC" //TODO: kapt는 유지보수로 바뀌었으므로 최대한 ksp로 전부 교체할 것
-    id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 
 
 }
