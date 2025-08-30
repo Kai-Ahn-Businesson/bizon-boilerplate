@@ -15,9 +15,8 @@ version =
 description = "backend"
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+    toolchain { languageVersion = JavaLanguageVersion.of(24) }
+    sourceCompatibility = JavaVersion.VERSION_24
 }
 
 configurations {
