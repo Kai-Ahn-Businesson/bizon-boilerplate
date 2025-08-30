@@ -13,7 +13,9 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.hibernate.orm") version "6.6.26.Final"
     id("org.graalvm.buildtools.native") version "0.10.6"
+    kotlin("kapt") version "2.2.20-RC" //TODO: kapt는 유지보수로 바뀌었으므로 최대한 ksp로 전부 교체할 것
     id("com.google.devtools.ksp") version "2.2.0-2.0.2"
+
 
 }
 
@@ -46,7 +48,10 @@ dependencies {
 
     // Configuration Processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    ksp("org.springframework.boot:spring-boot-configuration-processor")
+// TODO: 아직 해당 부분 스프링 부트가 미지원 하는 듯, 일단 레거시로 대체..
+//    ksp("org.springframework.boot:spring-boot-configuration-processor")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
+
 
 
     implementation("org.springframework.boot:spring-boot-starter-web")
