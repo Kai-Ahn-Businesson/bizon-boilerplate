@@ -76,3 +76,12 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+graalvmNative {
+    binaries {
+        configureEach {
+            verbose = true
+            buildArgs.add("-H:-CheckToolchain")
+        }
+    }
+}
