@@ -54,10 +54,14 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // dev only
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     //DB
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
