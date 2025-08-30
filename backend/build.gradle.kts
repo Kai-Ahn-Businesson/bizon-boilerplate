@@ -42,13 +42,24 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    //DB
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    // 프로덕션
+    runtimeOnly("org.postgresql:postgresql")
+
+    // 개발 환경: H2 사용 (빠른 개발/디버깅)
+    runtimeOnly("com.h2database:h2")
+
+    // 테스트: H2 사용 (격리된 테스트 환경) - `@DataJpaTest`등
+    testImplementation("com.h2database:h2")
+
 }
 
 
