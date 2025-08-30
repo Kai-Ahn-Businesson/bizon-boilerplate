@@ -42,6 +42,9 @@ repositories {
 }
 
 dependencies {
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-batch")
@@ -65,14 +68,10 @@ dependencies {
 
     //DB
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    // 프로덕션
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql")    // 프로덕션
+    runtimeOnly("com.h2database:h2")            // 개발 환경: H2 사용 (빠른 개발/디버깅)
+    testImplementation("com.h2database:h2")     // 테스트: H2 사용 (격리된 테스트 환경) - `@DataJpaTest`등
 
-    // 개발 환경: H2 사용 (빠른 개발/디버깅)
-    runtimeOnly("com.h2database:h2")
-
-    // 테스트: H2 사용 (격리된 테스트 환경) - `@DataJpaTest`등
-    testImplementation("com.h2database:h2")
 
 }
 
