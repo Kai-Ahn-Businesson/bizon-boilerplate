@@ -74,12 +74,14 @@ dependencies {
     testImplementation("com.h2database:h2")     // 테스트: H2 사용 (격리된 테스트 환경) - `@DataJpaTest`등
 
 
-    // Configuration Processor
-    // TODO: 아직 해당 부분 스프링 부트가 미지원 하는 듯, 일단 레거시로 대체..
-    //  ksp("org.springframework.boot:spring-boot-configuration-processor")
+    // Configuration Processor : 아직 ksp 없음
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
-
+    // mapstruct
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    testImplementation("org.mapstruct:mapstruct:1.6.3")
+    kapt("org.mapstruct:mapstruct-processor:1.6.3")
+    kaptTest("org.mapstruct:mapstruct-processor:1.6.3")
 
 }
 
