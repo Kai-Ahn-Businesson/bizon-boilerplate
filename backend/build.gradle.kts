@@ -38,7 +38,10 @@ configurations {
     compileOnly { extendsFrom(configurations.annotationProcessor.get()) }
     testCompileOnly { extendsFrom(configurations.testAnnotationProcessor.get()) }
 }
-repositories {}
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")

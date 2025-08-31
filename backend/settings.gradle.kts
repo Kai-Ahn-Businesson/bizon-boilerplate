@@ -9,10 +9,7 @@ pluginManagement {
     val kotlinVersion = providers.gradleProperty("kotlinVersion").orNull ?: "2.2.10"
     val dependencyManageVer = providers.gradleProperty("dependencyManageVer").orNull ?: "1.1.7"
 
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
+    repositories {}
     plugins {
         kotlin("jvm") version kotlinVersion
         kotlin("plugin.spring") version kotlinVersion
