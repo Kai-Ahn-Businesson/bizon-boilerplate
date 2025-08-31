@@ -12,7 +12,7 @@ pluginManagement {
         kotlin("jvm") version kotlinVersion
         kotlin("plugin.spring") version kotlinVersion
         kotlin("plugin.jpa") version kotlinVersion
-        kotlin("kapt") version kotlinVersion //TODO: kapt는 유지보수로 바뀌었으므로 최대한 ksp로 전부 교체할 것
+        kotlin("kapt") version kotlinVersion //TODO: kapt maintanance 전환, 이후 ksp로 교체 plan
         id("com.google.devtools.ksp") version "$kotlinVersion-2.0.2"
         id("org.springframework.boot") version springBootVersion
         id("io.spring.dependency-management") version dependencyManageVer
