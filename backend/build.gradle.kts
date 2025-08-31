@@ -10,9 +10,9 @@ plugins {
     kotlin("plugin.spring")
     kotlin("plugin.jpa")
     kotlin("kapt")
+    id("com.google.devtools.ksp")
     id("org.springframework.boot")
     id("io.spring.dependency-management")
-    id("com.google.devtools.ksp")
     id("org.hibernate.orm")
     id("org.graalvm.buildtools.native")
 }
