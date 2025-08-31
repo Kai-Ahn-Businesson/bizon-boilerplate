@@ -13,3 +13,8 @@ npm install -g yarn
 ```bash
 yarn create vite frontend --template react-ts
 ```
+
+# 바로 생성
+```bash
+yarn dev
+```
