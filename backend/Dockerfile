@@ -1,6 +1,9 @@
 # 백엔드 Dockerfile
 FROM eclipse-temurin:24-jre-alpine
 
+# curl 설치 (healthcheck용)
+RUN apk add --no-cache curl
+
 # 작업 디렉토리 설정
 WORKDIR /app
 
@@ -22,7 +25,7 @@ EXPOSE 8080
 
 # 헬스 체크
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # 애플리케이션 실행
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]

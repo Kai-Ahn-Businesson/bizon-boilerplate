@@ -167,7 +167,22 @@ jobs:
       run: |
         java -jar build/libs/*.jar &
         echo $! > app.pid
-        sleep 30  # 애플리케이션 시작 대기
+
+        # 백엔드가 완전히 시작될 때까지 헬스 엔드포인트를 폴링
+        for i in {1..30}; do
+          if curl -fs http://localhost:8080/actuator/health > /dev/null; then
+            echo "Backend is up!"
+            break
+          fi
+          echo "Waiting for backend to start... ($i/30)"
+          sleep 1
+        done
+
+        # 30초 내에 시작하지 않으면 실패 처리
+        if ! curl -fs http://localhost:8080/actuator/health > /dev/null; then
+          echo "Backend failed to start within timeout."
+          exit 1
+        fi
         
     - name: 헬스 체크
       run: |

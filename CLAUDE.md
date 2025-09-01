@@ -91,6 +91,6 @@ yarn preview
 - 프론트엔드: `frontend/package.json`, `frontend/vite.config.ts`
 - 백엔드: `backend/build.gradle.kts`, `backend/src/main/resources/application.properties`
 - 테스트: `frontend/.cursorrules`에 상세한 테스트 가이드라인 포함
-- frontend에서 yarn등의 명령어를 수행할때는 
+- frontend에서 yarn 등의 명령어를 수행할 때는 
 `cd frontend && source ./env-24.7.0/bin/activate`로
-가상환환경을 활성화 하고 수행해줘
+가상환경을 활성화 하고 수행해줘

@@ -124,10 +124,10 @@ jobs:
         path: ${{ matrix.component }}/
         
     - name: Docker Buildx 설정
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@988b5a0280414f521da01fcc63a27aeeb4b104db
       
     - name: GitHub Container Registry 로그인
-      uses: docker/login-action@v3
+      uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
@@ -135,7 +135,7 @@ jobs:
         
     - name: 메타데이터 추출
       id: meta
-      uses: docker/metadata-action@v5
+      uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81
       with:
         images: ${{ env.REGISTRY }}/${{ matrix.component == 'frontend' && env.FRONTEND_IMAGE || env.BACKEND_IMAGE }}
         tags: |
@@ -144,7 +144,7 @@ jobs:
           type=raw,value=${{ needs.build-and-test.outputs.version }}
           
     - name: Docker 이미지 빌드 및 푸시
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25
       with:
         context: ${{ matrix.component }}
         file: ${{ matrix.component }}/Dockerfile
@@ -216,7 +216,7 @@ jobs:
         cd ..
         
     - name: GitHub 릴리즈 생성
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@26994186c0ac3ef5cae75ac16aa32e8153525f77
       with:
         tag_name: ${{ needs.build-and-test.outputs.version }}
         name: Release ${{ needs.build-and-test.outputs.version }}
