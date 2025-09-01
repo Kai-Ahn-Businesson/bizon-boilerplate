@@ -1,0 +1,247 @@
+name: 릴리즈 자동화
+
+on:
+  push:
+    tags:
+      - 'v*'  # v1.0.0, v1.2.3-alpha 등 버전 태그
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '릴리즈 버전 (예: v1.0.0)'
+        required: true
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+  FRONTEND_IMAGE: ${{ github.repository }}-frontend
+  BACKEND_IMAGE: ${{ github.repository }}-backend
+
+jobs:
+  build-and-test:
+    name: 빌드 및 테스트
+    runs-on: ubuntu-latest
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      
+    steps:
+    - name: 코드 체크아웃
+      uses: actions/checkout@v4
+      
+    - name: 버전 추출
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          VERSION=${{ github.event.inputs.version }}
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "릴리즈 버전: ${VERSION}"
+    
+    # 프론트엔드 빌드
+    - name: Node.js 설정
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24.7.0'
+        cache: 'yarn'
+        cache-dependency-path: frontend/yarn.lock
+        
+    - name: 프론트엔드 의존성 설치
+      working-directory: ./frontend
+      run: yarn install --frozen-lockfile
+      
+    - name: 프론트엔드 테스트
+      working-directory: ./frontend
+      run: yarn test --run
+      
+    - name: 프론트엔드 프로덕션 빌드
+      working-directory: ./frontend
+      run: yarn build
+      
+    # 백엔드 빌드
+    - name: Java 24 설정
+      uses: actions/setup-java@v4
+      with:
+        java-version: '24'
+        distribution: 'temurin'
+        
+    - name: Gradle 캐시 설정
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Gradle 실행 권한 부여
+      working-directory: ./backend
+      run: chmod +x gradlew
+      
+    - name: 백엔드 테스트
+      working-directory: ./backend
+      run: ./gradlew test
+      
+    - name: 백엔드 빌드
+      working-directory: ./backend
+      run: ./gradlew build -x test
+      
+    # 빌드 결과물 업로드
+    - name: 프론트엔드 빌드 결과물 업로드
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-dist
+        path: frontend/dist/
+        
+    - name: 백엔드 JAR 파일 업로드
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-jar
+        path: backend/build/libs/*.jar
+
+  docker-build:
+    name: Docker 이미지 빌드
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    permissions:
+      contents: read
+      packages: write
+    
+    strategy:
+      matrix:
+        component: [frontend, backend]
+    
+    steps:
+    - name: 코드 체크아웃
+      uses: actions/checkout@v4
+      
+    - name: 빌드 결과물 다운로드
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ matrix.component }}-${{ matrix.component == 'frontend' && 'dist' || 'jar' }}
+        path: ${{ matrix.component }}/
+        
+    - name: Docker Buildx 설정
+      uses: docker/setup-buildx-action@988b5a0280414f521da01fcc63a27aeeb4b104db
+      
+    - name: GitHub Container Registry 로그인
+      uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 메타데이터 추출
+      id: meta
+      uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81
+      with:
+        images: ${{ env.REGISTRY }}/${{ matrix.component == 'frontend' && env.FRONTEND_IMAGE || env.BACKEND_IMAGE }}
+        tags: |
+          type=ref,event=tag
+          type=raw,value=latest
+          type=raw,value=${{ needs.build-and-test.outputs.version }}
+          
+    - name: Docker 이미지 빌드 및 푸시
+      uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25
+      with:
+        context: ${{ matrix.component }}
+        file: ${{ matrix.component }}/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  create-release:
+    name: GitHub 릴리즈 생성
+    runs-on: ubuntu-latest
+    needs: [build-and-test, docker-build]
+    permissions:
+      contents: write
+    
+    steps:
+    - name: 코드 체크아웃
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: 빌드 결과물 다운로드
+      uses: actions/download-artifact@v4
+      with:
+        pattern: "*"
+        merge-multiple: true
+        path: ./artifacts/
+        
+    - name: 릴리즈 노트 생성
+      id: release-notes
+      run: |
+        VERSION="${{ needs.build-and-test.outputs.version }}"
+        
+        # 이전 태그 찾기
+        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        
+        # 릴리즈 노트 생성
+        echo "## 🚀 릴리즈 ${VERSION}" > RELEASE_NOTES.md
+        echo "" >> RELEASE_NOTES.md
+        
+        if [ -n "$PREV_TAG" ]; then
+          echo "### 📋 변경사항" >> RELEASE_NOTES.md
+          git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" >> RELEASE_NOTES.md
+        else
+          echo "### 📋 변경사항" >> RELEASE_NOTES.md
+          echo "- 초기 릴리즈" >> RELEASE_NOTES.md
+        fi
+        
+        echo "" >> RELEASE_NOTES.md
+        echo "### 🐳 Docker 이미지" >> RELEASE_NOTES.md
+        echo "- **프론트엔드**: \`${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${VERSION}\`" >> RELEASE_NOTES.md
+        echo "- **백엔드**: \`${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${VERSION}\`" >> RELEASE_NOTES.md
+        echo "" >> RELEASE_NOTES.md
+        echo "### 📦 아티팩트" >> RELEASE_NOTES.md
+        echo "- 프론트엔드 빌드 결과물" >> RELEASE_NOTES.md
+        echo "- 백엔드 JAR 파일" >> RELEASE_NOTES.md
+        
+        # 파일을 환경변수로 전달
+        echo 'RELEASE_BODY<<EOF' >> $GITHUB_ENV
+        cat RELEASE_NOTES.md >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+        
+    - name: ZIP 파일 생성
+      run: |
+        cd artifacts
+        zip -r ../frontend-${{ needs.build-and-test.outputs.version }}.zip dist/ || true
+        zip -r ../backend-${{ needs.build-and-test.outputs.version }}.zip *.jar || true
+        cd ..
+        
+    - name: GitHub 릴리즈 생성
+      uses: softprops/action-gh-release@26994186c0ac3ef5cae75ac16aa32e8153525f77
+      with:
+        tag_name: ${{ needs.build-and-test.outputs.version }}
+        name: Release ${{ needs.build-and-test.outputs.version }}
+        body: ${{ env.RELEASE_BODY }}
+        draft: false
+        prerelease: ${{ contains(needs.build-and-test.outputs.version, 'alpha') || contains(needs.build-and-test.outputs.version, 'beta') || contains(needs.build-and-test.outputs.version, 'rc') }}
+        files: |
+          frontend-${{ needs.build-and-test.outputs.version }}.zip
+          backend-${{ needs.build-and-test.outputs.version }}.zip
+
+  notify:
+    name: 릴리즈 알림
+    runs-on: ubuntu-latest
+    needs: [build-and-test, create-release]
+    if: always()
+    
+    steps:
+    - name: 릴리즈 완료 알림
+      run: |
+        if [ "${{ needs.create-release.result }}" = "success" ]; then
+          echo "🎉 릴리즈 ${{ needs.build-and-test.outputs.version }} 이/가 성공적으로 완료되었습니다!"
+          echo "📦 GitHub 릴리즈: https://github.com/${{ github.repository }}/releases/tag/${{ needs.build-and-test.outputs.version }}"
+          echo "🐳 Docker 이미지:"
+          echo "  - ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ needs.build-and-test.outputs.version }}"
+          echo "  - ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ needs.build-and-test.outputs.version }}"
+        else
+          echo "❌ 릴리즈 ${{ needs.build-and-test.outputs.version }} 처리 중 오류가 발생했습니다."
+        fi
