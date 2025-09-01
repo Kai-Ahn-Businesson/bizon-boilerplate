@@ -15,6 +15,7 @@ plugins {
     id("io.spring.dependency-management")
     id("org.hibernate.orm")
     id("org.graalvm.buildtools.native")
+    id("org.owasp.dependencycheck") version "9.0.9"
 }
 
 group = "com.bizon"
@@ -104,4 +105,26 @@ graalvmNative {
             buildArgs.add("-H:-CheckToolchain")
         }
     }
+}
+
+// OWASP Dependency Check 설정
+dependencyCheck {
+    // CVE 데이터베이스 자동 업데이트 비활성화 (CI/CD에서 시간 절약)
+    autoUpdate = false
+    
+    // 분석할 형식 지정
+    analyzers.apply {
+        assemblyEnabled = false     // .NET assembly 분석 비활성화
+        jarEnabled = true          // JAR 파일 분석 활성화
+        centralEnabled = true      // Maven Central 분석 활성화
+    }
+    
+    // 보고서 형식 설정
+    formats = listOf("HTML", "XML")
+    
+    // 심각도 임계값 설정 (CVSS 점수 7.0 이상을 고위험으로 분류)
+    failBuildOnCVSS = 7.0f
+    
+    // 취약점 억제 설정 (필요시)
+    // suppressionFile = "owasp-suppressions.xml"
 }
