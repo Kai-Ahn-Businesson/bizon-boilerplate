@@ -24,10 +24,10 @@ hs_err_pid*
 replay_pid*
 
 # Claude 관련 파일들
-.claude
-.claude.*
-CLAUDE.md
-claude.*
+# .claude
+# .claude.*
+# CLAUDE.md
+# claude.*
 
 # Cursor 관련 파일들
 .cursorrules
