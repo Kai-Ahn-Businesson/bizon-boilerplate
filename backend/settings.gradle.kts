@@ -19,7 +19,7 @@ pluginManagement {
         id("org.springframework.boot") version springBootVersion
         id("io.spring.dependency-management") version dependencyManageVer
         id("org.hibernate.orm") version hibernatePluginVersion
-        id("org.graalvm.buildtools.native") version "0.10.6"
+        id("org.graalvm.buildtools.native") version "0.11.2"
     }
 }
 // 멀티 모듈 자를 때
