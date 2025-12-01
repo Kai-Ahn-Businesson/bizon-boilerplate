@@ -61,7 +61,7 @@ jobs:
       
     # 백엔드 빌드
     - name: Java 24 설정
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '24'
         distribution: 'temurin'
